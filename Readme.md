@@ -160,3 +160,53 @@ There is a special return type - `void`
 If a function doesn't return anything, the return type is void. It's comparable to null or undefined but it's only used with return value of functions.
 
 ## Generics
+
+Let's say we have a function here, which accepts two parameters which accepts any type of value.
+
+What this function does is it accepts an array, inserts a value at beginning at returns it.
+
+```typescript
+const demoArray = [1,2,3,4];
+
+const updatedArray = insertAtBeginning(demoArray, -1);
+
+function insertAtBeginning(array: any[], value: any){
+    const newarray = [value, ...array];
+    return newarray;
+}
+```
+
+So when we do things like that, due to any type, the function return value is infered as any, and that kind of destroys the typescript support,then when we try to perform a method on any element of updatedArray, we won't get any error like, if the array contains numbers and we try to perform `.split()` operation on it, typescript won't detect it and later we would face runtime error. **Pathetic**
+
+For this scenario, We have this feature known as `generics`.
+
+With Generics, We convert the function to a Generic Function with a *special syntax*.
+
+We add \<angle brackets\> after the *function name* infront of parameter list,inside angle brackets we set an `identifer` of some choice.  
+
+Usually, It's `T` for type and then we put the same for parameters type.
+
+Now typescript will actually look at the concrete value types provided in the function and set the type of returned value automatically depending on the parameters.
+
+So if we an array of numbers is returned, typescript would know when we try to perform string operations on it and It's just one example
+
+```typescript
+function insertAtBeginning<T>(array: T[], value: T){
+    const newarray = [value, ...array];
+    return newarray;
+}
+
+const newArray = insertAtBeginning([1,2,3,4], 4);
+newarray[4].split(''); // error cuz newArray contains numbers
+
+const newarray2 = insertAtBeginning(['a','b','c'], 'd');
+newarray2.split(''); // no array cuz same type
+```
+
+So with Generics function, we are giving some extra information to typescript like -
+
+- functions returns an array of `some` type.
+- the first parameter accepts an array of `some` type.
+- the second parameter accepts an value of again, `some` type.
+- So, the typescript would look into that `some` type and set it dynamically.
+- Flexibility and type-safety ez.
