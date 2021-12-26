@@ -265,3 +265,27 @@ const stringArray = insertAtBeginning<string>(['a', 'b', 'c'], 'd');
 ```
 
 So we can not just use the angle brackets to define a generic type but also to USE a generic type and explicitly set the placeholder type that should be used - sometimes this is required if TypeScript is not able to infer the (correct) type.
+
+---
+
+# Creating a new project with TypeScript support
+
+**C-R-A** supports creating project that is configured for TypeScript, Out of the Box... Isn't that great.
+
+We can also add TypeScript to existing project, but let's see how to create one...
+
+```
+npx create-react-app my-app --template typescript
+```
+
+If we run the above command, It will create a new react project but this time, with TypeScript support out of the box!
+
+### Analyzing the Created Project
+
+- We can find files with `.tsx` extensions, we should use this extensions if we use JSX code in the file.
+- We can use `.ts` extension if we don't use JSX code in the file.
+- Now, starting server for development or building for production, It compiles the `ts` code to `js` behind the scenes.
+- We can find some couple of extra dependencies, including `typescript` and some `@types` dependencies.
+- These `@types` packages acts as translation bridges between vanilla javascript and typescript.
+
+
