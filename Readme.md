@@ -449,3 +449,66 @@ Because, this code written in a function that can only be called after form is p
 
 ### Working with Function props
 
+Setting the type as Functional Component.
+```typescript
+const NewTodo: React.FC = () => {}
+```
+
+Setting the props type.
+Here, we know `onAddTodo` is a reference to a function, We can set Type to a function by defining an arrow function `() => {}`
+
+So, setting the object in generic type as `React.FC<{ onAddTodo: () => {} }>`
+
+But, here, it needs arguements too, so `(text) => {}` and it doesn't return anything so `(text) => void`.
+
+We're not done here yet, We have to set type of the parameter as well, so `(text: string) => void`
+
+*Just like defining properties inside `{}` doesn't create a new object, defining type like this doesn't create a new arrow function.*
+
+```typescript
+const NewTodo: React.FC<{onAddTodo: (text: string) => void}> = (props) => {}
+```
+
+### Managing State & TypeScript 
+
+Okay, Let's look at a funny thing.. If we setup a state like we usually do with an Initial value of empty array.
+
+```typescript
+const [todos, setTodos] = useState([]);
+```
+
+The type of `todos[]` is set to `never`, which means it should always be an empty arrow and no value should be assigned to it ever, and that's ofcourse not what we want.
+
+But typescript, infers this type because it cannot tell which type of array it should, to make it clear we again need to tell TypeScript somehow...
+
+`useState` is out of the box, is a generic Function for this reason, we're able to tell it the kind of data managed by `useState` in \<angular brackets\>
+
+```typescript
+// This state will manage an array of todos
+const [todos,setTodos] = useState<Todo[]>([]);
+
+// This state will manage an array of string
+const [names,setNames] = useState<string[]>([]);
+
+// This state will manage an array of numbers
+const [names,setNames] = useState<number[]>([]);
+
+// The Initial value is an Empty array for all.
+```
+
+Now we can manage a state of todos, and update the todos when required.
+
+```typescript
+const [todos, setTodos] = useState<Todo[]>([]);
+
+  const addTodoHandler = (todoText: string) => {
+    const newTodo = new Todo(todoText);
+
+    setTodos((prevTodos) => {
+      // concat creates a new array
+      return prevTodos.concat(newTodo);
+    });
+};
+```
+
+
