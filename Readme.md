@@ -510,5 +510,26 @@ const [todos, setTodos] = useState<Todo[]>([]);
     });
 };
 ```
+### Removing Todo Items
+
+We can either drill the ID to last component that uses it to invoke the function that removes the todo **OR...**
+
+We can bind the value to the function, so we can pre-configure it what arguements to pass when it's executed.
+
+**Bind() is a method which enables us to pre-configure a function for future executions**
+
+```typescript
+onRemoveTodo={props.onRemoveTodo.bind(null, props.id)}
+```
+
+- First arugement sets the `this` context of Fn, we set it to null.
+- Second arguement is the first arguement which is passed to the function when it's invoked.
+
+Or If you're using prop drilling, we have to use functional approach
+
+`onClick={() => {// do something}}`
+
+because `onClick={pointer}` would throw TypeScript error cuz `onClick` is a `React.MouseEvent` Type function.
+
 
 
