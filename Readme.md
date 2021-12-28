@@ -288,4 +288,164 @@ If we run the above command, It will create a new react project but this time, w
 - We can find some couple of extra dependencies, including `typescript` and some `@types` dependencies.
 - These `@types` packages acts as translation bridges between vanilla javascript and typescript.
 
+### Working with Components and props
+
+Working with the Components is almost same as we learned it, but working with props is a little different.
+
+```typescript
+const Todos: React.FC<{ items: string[] }> = (props) => {
+  return <ul>{props}</ul>;
+};
+
+export default Todos;
+
+```
+
+We defined Todos Component of type `React.FC` which is a predefined type for `Functional Components`. Doing this, we're telling typescript that this function is a functional Component which will have props and special props like children.  
+
+Now to have some props of our own, we have to tell typescript that this prop is going to have them.  
+
+We can pass a object to `React.FC` in \<angular brackets\>, to define our prop types. In this object we define all props we're going to have which then merges with the base prop types, so we will have all typescript support including the base props (children) as well as our custom props. (items)
+
+*We're using a generic type here, Before we defined one instead.*
+
+
+### Adding a Data Model
+
+Create a folder named `Models` and a `.ts` file for defining the model.
+
+We can create a data model with `type`, `interface` or `class`.
+
+Let's create a class for `Todos`
+
+```typescript
+// Todo.ts
+class Todo {
+  id: string;
+  text: string;
+
+  constructor(todoText: string) {
+    this.text = todoText;
+    this.id = new Date().toISOString();
+  }
+}
+
+export default Todo;
+```
+
+Here, we had to declare all the properties we're going to use along with it's type in the class.
+
+Now, import the class in app and create objects from it.
+
+```typescript
+// App.tsx
+import Todos from './components/Todos';
+import Todo from './models/Todo';
+
+function App() {
+  const todos = [new Todo('Learn React'), new Todo('Learn Typescript')];
+
+  return (
+    <div>
+      <Todos items={todos} />
+    </div>
+  );
+}
+
+export default App;
+```
+
+Now, as we're sending data of type todo from here, we have to do some changes in the Component as well.
+
+Import the class, set the props type to that class, so we're telling we will receive array of todos here.
+```typescript
+// Todos.tsx
+import Todo from '../models/Todo';
+
+const Todos: React.FC<{ items: Todo[] }> = (props) => {
+  return (
+    <ul>{[props.items.map((item) => <li key={item.id}>{item.text}</li>)]}</ul>
+  );
+};
+
+export default Todos;
+```
+
+*li item can be outsourced as a separate Component*.
+
+### Form Submissions with TypeScript 
+
+```typescript
+const NewTodo = () => {
+  const formSubmitHandler = (e: React.FormEvent) => {
+    e.preventDefault();
+  };
+
+  return (
+    <form onSubmit={formSubmitHandler}>
+      <label htmlFor="text">Todo Text</label>
+      <input type="text" id="text" />
+      <button>Add Todo</button>
+    </form>
+  );
+};
+
+export default NewTodo;
+```
+
+Here we had to define the type of Event object as `React.FormEvent` because react is expecting a function to handle onSubmit with such type.
+
+If it were a Click Event, It would've `React.MouseEvent`, any mismatch in Event types, TypeScript would let us know about it.  
+
+
+### Using Refs and useRef
+
+Using refs with Typescript is simple..
+
+import the useRef hook
+```typescript
+import React, { useRef } from 'react';
+```
+
+In a component, Initialize the hook.
+```typescript
+const textInputRef = useRef<HTMLInputElement>(null);
+```
+
+Here, we have to do 2 extra step.
+
+- Give Generic type to useRef hook to explicitly tell which kind of Html it will connect to.
+- Pass a Initial value to the ref. `null`
+
+That's all, we can now connect it to a html element as we would normally do.
+
+```typescript
+<input type="text" id="text" ref={textInputRef} />
+```
+
+`HTMLInputElement` type is nothing typescript specific, It's a general type used in HTML, there are more `HTMLParagraphElement`, `HtmlButtonElement` and more.
+
+
+**Extracting values from Refs:**
+
+```typescript
+const enteredText = textInputRef.current?.value;
+```
+
+Here, IDE added a **?** before accessing `.value` property on current Ref, because TypeScript doesn't deeply analyze our code and tell at this point Ref is not `null`.
+
+Hence, `enteredText` is of type `string` || *OR* `undefined`.
+
+To tell typescript, that at this point we won't have a possible null value we use exclaimation mark **!** instead of question mark **?**
+
+ ```typescript
+const enteredText = textInputRef.current!.value;
+```
+
+So the type of `enteredText` is set to `string` only.
+
+Because, this code written in a function that can only be called after form is populated, and if it's populated refs are already connected, so it's okay here to be explicit about it.
+
+
+### Working with Function props
 
