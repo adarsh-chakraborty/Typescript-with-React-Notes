@@ -531,5 +531,80 @@ Or If you're using prop drilling, we have to use functional approach
 
 because `onClick={pointer}` would throw TypeScript error cuz `onClick` is a `React.MouseEvent` Type function.
 
+### ContextAPI and TypeScript
 
+For Convention, let's add a store folder and create a new `.tsx` file to store todos context.
 
+```typescript
+const TodosContext = React.createContext({
+    items: [],
+    addTodo: () => {},
+    removeTodo: (id: string) => {}
+})
+```
+
+Now `createContext` also is an generic type, and we can set some things in angular breackets.
+
+```typescript
+import Todo from '../models/Todo';
+import React, { useState } from 'react';
+
+type todoContextObj = {
+  items: Todo[];
+  addTodo: (text: string) => void;
+  removeTodo: (id: string) => void;
+};
+
+export const TodosContext = React.createContext<todoContextObj>({
+  items: [],
+  addTodo: () => {},
+  removeTodo: (id: string) => {}
+  // default value, doesn't matter
+});
+
+const TodosContextProvider: React.FC = (props) => {
+  const [todos, setTodos] = useState<Todo[]>([]);
+
+  const addTodoHandler = (todoText: string) => {
+    const newTodo = new Todo(todoText);
+
+    setTodos((prevTodos) => {
+      // concat creates a new array
+      return prevTodos.concat(newTodo);
+    });
+  };
+
+  const removeTodoHandler = (id: string) => {
+    setTodos((prevTodo) => {
+      return prevTodo.filter((todo) => todo.id !== id);
+    });
+  };
+
+  const contextValue: todoContextObj = {
+    items: todos,
+    addTodo: addTodoHandler,
+    removeTodo: removeTodoHandler
+  };
+  return (
+    <TodosContext.Provider value={contextValue}>
+      {props.children}
+    </TodosContext.Provider>
+  );
+};
+
+export default TodosContextProvider;
+```
+
+Now we can use the Context in the components as we learned it.
+
+### Exploring tsconfig.json
+
+This is a file we can add to any project in which we're using TypeScript, It will configure the compilation of TypeScript to JavaScript.
+
+Some important properties mentioned in the json - 
+
+- `target` target javascript version, the code is compiled to, It's usually es5 which has broad browser support.
+- `target` isn't the last step of compilation of javascript, for example if we use babel it again can do some more compilation.
+- `lib` has default libraries for ts, we have to mention them to use them in our project e.g `dom` has all default DOM types.
+- `allowJs` tells if we can include plain `.js` files in our project.
+- `strict` mode allows us to explicitly mention types where it can't infer it automatically. Doesn't allow `any` type implicitly.
